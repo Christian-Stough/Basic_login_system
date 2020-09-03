@@ -1,0 +1,127 @@
+import os.path as path
+import csv
+
+
+class Startup_and_Shutdown():
+    def start_up(self):
+        if path.isfile('./login_info.csv') is False:
+            with open('login_info.csv', 'a') as info:
+                info_writer = csv.DictWriter(info, fieldnames=['Username', 'Password'])
+                info_writer.writeheader()
+                info_writer.writerow({'Username': 'ADMIN', 'Password': 'password'})
+        successful_login = False
+        while successful_login is False:
+            login_or_create = input("Are you \"logging in\" today or \"creating an account\"?: ").upper()
+
+            if login_or_create == "LOGGING IN" or login_or_create == "LOG IN" or login_or_create == "LOGIN":
+                successful_login = True
+                attempts = 0
+                while attempts < 5:
+                    logged_in = self.login()
+                    if logged_in is True:
+                        print("You are logged in!")
+                        attempts = 1000
+                    else:
+                        print("Username or Password incorrect")
+                        attempts += 1
+                if attempts == 5:
+                    print("Too many attempts, Try again later")
+            elif login_or_create == "CREATING AN ACCOUNT" or login_or_create == "CREATE":
+                self.create_an_account()
+            elif successful_login is not True:
+                print("Please enter either \"logging in\" or \"create\"")
+        start_app = Application()
+
+    def login(self):
+        logged_in = False
+        username = input("What is your username?(type back to go back): ").upper()
+        self.back_to_main(username)
+        password = input("What is your password?: ")
+        self.back_to_main(password)
+        with open('login_info.csv', 'r') as file:
+            file_reader = csv.DictReader(file)
+            for user in file_reader:
+                if user['Username'] == username and user['Password'] == password:
+                    logged_in = True
+        return logged_in
+
+    def create_an_account(self):
+        unique_username = False
+        username = ""
+        password_check = False
+        while unique_username is not True:
+            username = input("What do you want your username to be?(Type back to go back): ").upper()
+            self.back_to_main(username)
+
+            with open('login_info.csv', 'r') as file:
+
+                file_reader = csv.DictReader(file)
+                unique = True
+                for user in file_reader:
+                    if user['Username'] == username:
+                        unique = False
+                if unique is True:
+                    unique_username = True
+                else:
+                    print("Username is Taken.")
+
+        while password_check is not True:
+            password = input("What would you like to be your password?(Type back to go back): ")
+            self.back_to_main(password)
+            password_confirm = input("Please confirm your password: ")
+            self.back_to_main(password)
+            if password == password_confirm:
+                password_check = True
+                with open('login_info.csv', 'a') as file:
+                    file_writer = csv.DictWriter(file, fieldnames=['Username', 'Password'])
+                    file_writer.writerow({'Username': username, 'Password': password})
+            else:
+                print("Passwords do not match")
+        print("Your account has been created! Please attempt to log in")
+
+
+    def back_to_main(self,back):
+        if back.upper() == "BACK":
+            self.start_up()
+
+    def log_out(self):
+        print("Logging you out...")
+        print("...")
+        print("...")
+        print("...")
+        self.start_up()
+
+
+
+class Application:
+
+    def __init__(self):
+        start_up = Startup_and_Shutdown()
+        logged_out = False
+        print("...")
+        print("...")
+        print("...")
+        while logged_out is not True:
+            print("Welcome to The Do Nothing Program!")
+            print("What would you like to do today? ")
+            choice = input('"Log out": ').upper()
+            #Logs user out
+            if choice == "LOG OUT" or choice == "LOGOUT":
+                double_check = input("Are you sure you want to log out?: ")
+                if double_check.upper() == "Y" or double_check.upper() == "YES":
+                    logged_out = True
+
+        if logged_out is True:
+            start_up.log_out()
+
+
+
+
+
+
+
+my_app = Startup_and_Shutdown()
+
+my_app.start_up()
+
+
